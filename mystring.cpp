@@ -124,8 +124,12 @@ char *my_strdup(const char *const refStr) {
 }
 
 static const size_t BUFFER_BLOCK_SIZE = 256;
-ssize_t my_getline(char **const lineptr, size_t *const n) {
-    if (lineptr == NULL) {
+ssize_t my_getline(char **const lineptr, size_t *const n, FILE *const file) {
+    assert(lineptr);
+    assert(n);
+    assert(file);
+
+    if (*lineptr == NULL) {
         *n = BUFFER_BLOCK_SIZE;
         *lineptr = (char *)calloc(*n, sizeof(char));
         if (*lineptr == NULL)
@@ -134,7 +138,9 @@ ssize_t my_getline(char **const lineptr, size_t *const n) {
 
     ssize_t i = 0;
     int c = 0;
-    while ((c = getchar()) != '\n') {
+
+    do {
+        c = getc(file);
         if (c == EOF)
             return -1;
 
@@ -147,10 +153,29 @@ ssize_t my_getline(char **const lineptr, size_t *const n) {
 
         (*lineptr)[i] = (char)c;
         i++;
-    }
+    } while (c != '\n');
 
     (*lineptr)[i] = '\0'; 
     return i;
 }
 
-// strstr
+static bool compareNeedle(const char **const haystack, const char *const needle) {
+    size_t i = 0;
+    for (; (*haystack)[i] != '\0' && needle[i] != '\0' && (*haystack)[i] == needle[i]; i++);
+
+    if (needle[i] == '\0')
+        return true;
+
+    //*haystack += i;
+
+    return false;
+}
+
+char *my_strstr(const char * haystack, const char *const needle) {
+    for (; *haystack != '\0'; haystack++) {
+        if (compareNeedle(&haystack, needle))
+            return (char *)haystack;
+    }
+
+    return NULL;
+}

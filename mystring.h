@@ -14,6 +14,7 @@ char *my_strncat(char *dst, const char *src, size_t n);
 int my_atoi(const char *text);
 char *my_strdup(const char *text);
 char *my_fgets(char *line, int maxline, FILE *fp);
-ssize_t my_getline(char **lineptr, size_t *n);
+ssize_t my_getline(char **lineptr, size_t *n, FILE *file);
+char *my_strstr(const char * haystack, const char *needle);
 
 #endif

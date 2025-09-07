@@ -15,15 +15,18 @@ static void readLine(char *ptr) {
 }
 
 int main() {
-    char *mybuffer = (char *)malloc(sizeof(char)*14);
-    size_t myn = 0;
+    char haystack[256] = {};
+    char needle[256] = {};
 
-    ssize_t res = my_getline(&mybuffer, &myn);
+    scanf("%[^\n]%*[\n]", haystack);
+    scanf("%[^\n]", needle);
 
-    printf("%s\n", mybuffer);
-    printf("%zd\n", res);
+    printf("haystack: %s\n", haystack);
+    printf("needle  : %s\n", needle);
 
-    free(mybuffer);
+    printf("haystack: %p\n", haystack);
+    printf("mystrstr: %p\n", my_strstr(haystack, needle));
+    printf("  strstr: %p\n", strstr(haystack, needle));
 
     return 0;
 }
