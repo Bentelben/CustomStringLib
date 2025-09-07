@@ -1,5 +1,6 @@
 #include "mystring.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -7,7 +8,8 @@
 int my_puts(char const *str) {
     assert(str);
 
-    while (putchar(*(str++)) != EOF);
+    while (*str != '\0' && putchar(*(str++)) != EOF);
+
     return putchar('\n');
 }
 
@@ -26,8 +28,9 @@ size_t my_strlen(const char *str) {
     assert(str);
 
     size_t i = 0;
-    while (str[i++] != '\0');
-    return i-1;
+    while (str[i] != '\0') 
+        i++;
+    return i;
 }
 
 char *my_strcpy(char *dst, const char *src) {
@@ -36,6 +39,7 @@ char *my_strcpy(char *dst, const char *src) {
 
     char *tmp = dst;
     while ( (*(dst++) = *(src++)) != '\0' );
+
     return tmp;
 }
 
@@ -67,12 +71,7 @@ char *my_strncat(char *dst, const char *src, size_t n) {
 
     char *ptr = dst + my_strlen(dst);
 
-    size_t len = my_strlen(src);
-    if (len > n)
-        len = n;
-
-    my_strncpy(ptr, src, len);
-    ptr[len] = '\0';
+    my_strncpy(ptr, src, n);
 
     return dst;
 }
@@ -80,12 +79,9 @@ char *my_strncat(char *dst, const char *src, size_t n) {
 int my_atoi(const char *text) {
     assert(text);
 
-    while (*text == ' '
-        || *text == '\n'
-        || *text == '\t'
-        || *text == '\v') text++;
+    while (isspace(*text)) text++;
 
-    const bool isNegative = *text == '-';
+    const bool isNegative = (*text == '-');
     if (*text == '-' || *text == '+')
         text++;
 
@@ -104,14 +100,16 @@ char *my_fgets(char *const line, const int maxline, FILE *const fp) {
         return NULL;
 
     int c = 0;
-    for (int i = 0; i < maxline-1; i++) {
+    int i = 0;
+    for (; c != '\n' && i < maxline-1; i++) {
         c = getc(fp);
         if (c == EOF)
             return NULL;
+        
         line[i] = (char)c;
     }
     
-    line[maxline-1] = '\0';
+    line[i] = '\0';
     return line;
 }
 
@@ -155,4 +153,4 @@ ssize_t my_getline(char **const lineptr, size_t *const n) {
     return i;
 }
 
-
+// strstr
