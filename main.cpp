@@ -5,15 +5,6 @@
 
 #include "mystring.h"
 
-const size_t bufferSize = 256;
-
-static void readLine(char *ptr) {
-    assert(ptr);
-    printf("enter string: ");
-    scanf("%[^\n]", ptr);
-    getchar();
-}
-
 int main() {
     char haystack[256] = {};
     char needle[256] = {};

@@ -18,7 +18,7 @@ char *my_strchr(const char *str, int c) {
 
     do {
         if (*str == c)
-            return (char *)str;
+            return const_cast<char *>(str);
     } while (*(str++) != '\0');
 
     return NULL;
@@ -131,7 +131,7 @@ ssize_t my_getline(char **const lineptr, size_t *const n, FILE *const file) {
 
     if (*lineptr == NULL) {
         *n = BUFFER_BLOCK_SIZE;
-        *lineptr = (char *)calloc(*n, sizeof(char));
+        *lineptr = (char *)calloc(BUFFER_BLOCK_SIZE, sizeof(char));
         if (*lineptr == NULL)
             return -1;
     }
@@ -159,22 +159,35 @@ ssize_t my_getline(char **const lineptr, size_t *const n, FILE *const file) {
     return i;
 }
 
-static bool compareNeedle(const char **const haystack, const char *const needle) {
-    size_t i = 0;
-    for (; (*haystack)[i] != '\0' && needle[i] != '\0' && (*haystack)[i] == needle[i]; i++);
+static bool compareNeedle(const char **const haystack, const char *const needle, const size_t needleLength, size_t *const letterSteps) {
+    for (size_t i = needleLength - 1; i != 0; i--) {
+        if ((int)(*haystack)[i] != needle[i]) {
 
-    if (needle[i] == '\0')
-        return true;
+            if (letterSteps[(int)(*haystack)[i]] != 0)
+                *haystack += letterSteps[(int)(*haystack)[i]] - 2;
 
-    //*haystack += i;
+            return false;
+        }
+    }
 
-    return false;
+    return (*haystack)[0] == needle[0];
 }
 
 char *my_strstr(const char * haystack, const char *const needle) {
-    for (; *haystack != '\0'; haystack++) {
-        if (compareNeedle(&haystack, needle))
-            return (char *)haystack;
+    size_t letterSteps[256] = {};
+    const size_t needleLength = my_strlen(needle);
+    const size_t haystackLength = my_strlen(haystack);
+
+    if (haystackLength < needleLength)
+        return NULL;
+
+    for (size_t i = 0; i < needleLength; i++)
+        if (letterSteps[(int)needle[i]] == 0)
+            letterSteps[(int)needle[i]] = needleLength - i;
+    
+    for (; haystack[needleLength-1] != '\0'; haystack++) {
+        if (compareNeedle(&haystack, needle, needleLength, letterSteps))
+            return const_cast<char *>(haystack);
     }
 
     return NULL;
